@@ -50,22 +50,26 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         databaseMapper.setFinishATransaction(idTransaction);
     }
 
-    public Boolean checkTOPUPThirdParty(Integer partyCode){
+    public Boolean checkTOPUPThirdParty(String partyCode){
         if (databaseMapper.checkThirdPartyExists(partyCode) == 0){
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
     }
 
-    public void TOPUPBalance(String idUser, Double amount, Integer virtualNumber, Integer partyCode){
+    public void TOPUPBalance(String idUser, Double amount, String virtualNumber, String partyCode){
         databaseMapper.TOPUP(idUser, amount);
         Transaction transaction = databaseMapper.getLatestUserSuccessfulTransaction(idUser);
         ThirdParty thirdParty = databaseMapper.selectThirdPartyByCode(partyCode);
         databaseMapper.addVirtualPayment(transaction.getIdTransaction(), virtualNumber, thirdParty.getIdThirdParty());
     }
 
-    public Integer getPartyCode(Integer virtualNumber){
-        return Integer.valueOf((""+virtualNumber).charAt(0)+(""+virtualNumber).charAt(1)+(""+virtualNumber).charAt(2)+(""+virtualNumber).charAt(3));
+    public String getPartyCode(String virtualNumber){
+        return virtualNumber.substring(0,4);
+    }
+
+    public String getPhoneNumberFromVA(String virtualNumber){
+        return (""+virtualNumber).substring(4);
     }
 
     public void broadcastATransaction(Integer idTransaction){

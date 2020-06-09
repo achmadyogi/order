@@ -6,7 +6,8 @@ public interface TransactionRepository {
     Boolean checkATransactionExpiration(Integer idTransaction);
     void setFinishATransaction(Integer idTransaction);
     void broadcastATransaction(Integer idTransaction);
-    Integer getPartyCode(Integer virtualNumber);
-    Boolean checkTOPUPThirdParty(Integer partyCode);
-    void TOPUPBalance(String idUser, Double amount, Integer virtualNumber, Integer partyCode);
+    String getPartyCode(String virtualNumber);
+    Boolean checkTOPUPThirdParty(String partyCode);
+    void TOPUPBalance(String idUser, Double amount, String virtualNumber, String partyCode);
+    String getPhoneNumberFromVA(String virtualNumber);
 }

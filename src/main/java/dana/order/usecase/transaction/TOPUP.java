@@ -1,6 +1,7 @@
 package dana.order.usecase.transaction;
 
 import dana.order.adapter.wrapper.ResponseWrapper;
+import dana.order.entity.Transaction;
 import dana.order.entity.User;
 import dana.order.usecase.exception.OrderFailedException;
 import dana.order.usecase.exception.TOPUPFailedException;
@@ -24,6 +25,9 @@ public class TOPUP {
 
     @Autowired
     DatabaseMapper databaseMapper;
+
+    @Autowired
+    UserRepository userRepository;
 
     public JSONObject execute(JSONObject json){
 
@@ -56,12 +60,23 @@ public class TOPUP {
             throw new TOPUPFailedException("TOPUP failed! You have reached your maximum balance amount.", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        if (transactionRepository.thirdPartyCheck(""+json.get("virtualNumber")) == Boolean.FALSE){
+        String partyCode = transactionRepository.getPartyCode(""+json.get("virtualNumber"));
+        String phoneNumber = transactionRepository.getPhoneNumberFromVA(""+json.get("virtualNumber"));
+
+        if (userRepository.doesPhoneNumberCorrect(""+json.get("idUser"), phoneNumber) == Boolean.FALSE){
+            throw new TOPUPFailedException("TOPUP failed! You have entered a wrong virtual number.", HttpStatus.NOT_FOUND);
+        }
+
+        if (transactionRepository.checkTOPUPThirdParty(partyCode) == Boolean.FALSE){
             throw new TOPUPFailedException("The merchant is currently not available for balance TOPUP.", HttpStatus.NOT_FOUND);
         }
 
         transactionRepository.TOPUPBalance(""+json.get("idUser"), Double.valueOf(""+json.get("amount")),
-                Integer.valueOf(""+json.get("virtualNumber")), Integer.valueOf(""+json.get("partyCode")));
+                ""+json.get("virtualNumber"), partyCode);
+
+        Transaction transaction = databaseMapper.getLatestUserSuccessfulTransaction(""+json.get("idUser"));
+
+        transactionRepository.broadcastATransaction(transaction.getIdTransaction());
 
         return ResponseWrapper.wrap("Your TOPUP is successful!", 200, null);
     }

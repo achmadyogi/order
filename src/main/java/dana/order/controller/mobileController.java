@@ -43,7 +43,7 @@ public class mobileController {
     public ResponseEntity<?> TOPUP(@PathVariable("idUser") Integer idUser, @RequestBody JSONObject json){
         json.put("idUser", idUser);
         JSONObject result = topup.execute(json);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping(value = "/api/user/{idUser}/transaction", produces = MediaType.APPLICATION_JSON_VALUE)

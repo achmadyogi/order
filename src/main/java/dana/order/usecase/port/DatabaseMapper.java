@@ -34,7 +34,7 @@ public interface DatabaseMapper {
     final String TOPUP = "INSERT INTO transactions (id_user, amount, transaction_date, is_credit, id_transaction_status, " +
             "id_payment_method, id_service) VALUES (#{idUser}, #{amount}, NOW(), 1, 1, 2, 1)";
     final String addVirtualPayment = "INSERT INTO virtual_payments (id_transaction, virtual_number, id_third_party) VALUES " +
-            "(#{idTransaction}, #{virtualNumber}, #{idThirdParty}";
+            "(#{idTransaction}, #{virtualNumber}, #{idThirdParty})";
     final String selectThirdPartyByCode = "SELECT * FROM third_parties WHERE party_code = #{partyCode}";
 
     @Select(selectThirdPartyByCode)
@@ -43,10 +43,10 @@ public interface DatabaseMapper {
             @Result(property = "partyName", column = "party_name"),
             @Result(property = "partyCode", column = "party_code")
     })
-    ThirdParty selectThirdPartyByCode(@Param("partyCode") Integer partyCode);
+    ThirdParty selectThirdPartyByCode(@Param("partyCode") String partyCode);
 
     @Insert(addVirtualPayment)
-    void addVirtualPayment(@Param("idTransaction") Integer idTransaction, @Param("virtualNumber") Integer virtualNumber,
+    void addVirtualPayment(@Param("idTransaction") Integer idTransaction, @Param("virtualNumber") String virtualNumber,
                            @Param("idThirdParty") Integer idThirdParty);
 
     @Insert(TOPUP)
@@ -56,7 +56,7 @@ public interface DatabaseMapper {
     @Results(value = {
             @Result(column = "amount")
     })
-    Integer checkThirdPartyExists(@Param("partyCode") Integer partyCode);
+    Integer checkThirdPartyExists(@Param("partyCode") String partyCode);
 
     @Update(setFinishATransaction)
     void setFinishATransaction(@Param("idTransaction") Integer idTransaction);
@@ -90,6 +90,7 @@ public interface DatabaseMapper {
     @Results(value = {
             @Result(property = "idUser", column = "id_user"),
             @Result(property = "balance", column = "balance"),
+            @Result(property = "phoneNumber", column = "phone_number"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at")
     })

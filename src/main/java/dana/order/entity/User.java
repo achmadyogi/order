@@ -9,6 +9,7 @@ import java.util.Date;
 public class User {
     private String idUser;
     private Double balance;
+    private String phoneNumber;
     private Date createdAt;
     private Date updatedAt;
 
@@ -26,6 +27,14 @@ public class User {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Date getCreatedAt() {
