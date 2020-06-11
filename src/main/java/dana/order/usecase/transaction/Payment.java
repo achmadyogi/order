@@ -39,7 +39,7 @@ public class Payment {
         validatePayAVoucher.check(json);
 
         if (userRepository.doesUserExist(""+json.get("idUser")) == Boolean.FALSE){
-            throw new UserException("User is not found.", HttpStatus.NOT_FOUND);
+            throw new UserException("The user is not found.", HttpStatus.NOT_FOUND);
         }
 
         Transaction transaction = databaseMapper.getTransactionById(Integer.valueOf(""+json.get("idTransaction")));

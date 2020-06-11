@@ -1,5 +1,7 @@
 package dana.order.controller;
 
+import dana.order.usecase.history.DetailedTransactionHistory;
+import dana.order.usecase.history.TransactionHistory;
 import dana.order.usecase.transaction.Payment;
 import dana.order.usecase.transaction.PlaceOrder;
 import dana.order.usecase.transaction.TOPUP;
@@ -23,6 +25,12 @@ public class mobileController {
 
     @Autowired
     TOPUP topup;
+
+    @Autowired
+    TransactionHistory transactionHistory;
+
+    @Autowired
+    DetailedTransactionHistory detailedTransactionHistory;
 
     @PostMapping(value = "/api/user/{idUser}/transaction/voucher", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> placeOrder(@PathVariable("idUser") String idUser, @RequestBody JSONObject json){
@@ -48,16 +56,27 @@ public class mobileController {
 
     @GetMapping(value = "/api/user/{idUser}/transaction", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> transactionHistory(@PathVariable("idUser") String idUser,
-                                                @RequestParam("category") Optional<String> category,
-                                                @RequestParam("filter-start-date") Optional<String> startDate,
-                                                @RequestParam("filter-end-date") Optional<String> endDate,
-                                                @RequestParam("page") Optional<Integer> page){
-        return new ResponseEntity<>(HttpStatus.OK);
+                                                @RequestParam(value = "category", required = false) String category,
+                                                @RequestParam(value = "filter-start-date", required = false) String startDate,
+                                                @RequestParam(value = "filter-end-date", required = false) String endDate,
+                                                @RequestParam(value = "page", required = false) Integer page){
+        JSONObject json = new JSONObject();
+        json.put("idUser", idUser);
+        json.put("category", category);
+        json.put("startDate", startDate);
+        json.put("endDate", endDate);
+        json.put("page", page);
+        JSONObject result = transactionHistory.get(json);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping(value = "/api/user/{idUser}/transaction/{idTransaction}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> detailedTransactionHistory(@PathVariable("idUser") String idUser,
                                                         @PathVariable("idTransaction") Integer idTransaction){
-        return new ResponseEntity<>(HttpStatus.OK);
+        JSONObject json = new JSONObject();
+        json.put("idUser", idUser);
+        json.put("idTransaction", idTransaction);
+        JSONObject result = detailedTransactionHistory.get(json);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

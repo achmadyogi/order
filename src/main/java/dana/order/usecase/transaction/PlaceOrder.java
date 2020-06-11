@@ -37,7 +37,7 @@ public class PlaceOrder{
         validateBuyAVoucher.check(json);
 
         if (userRepository.doesUserExist(""+json.get("idUser")) == Boolean.FALSE){
-            throw new UserException("User is not found.", HttpStatus.NOT_FOUND);
+            throw new UserException("The user is not found.", HttpStatus.NOT_FOUND);
         }
 
         if (voucherRepository.validateExpiration(Integer.valueOf(""+json.get("idVoucher"))) == Boolean.FALSE){

@@ -15,7 +15,7 @@ public class ValidateBuyAVoucher {
         }
 
         if(idVoucherCheck(""+json.get("idVoucher")) == Boolean.FALSE){
-            throw new OrderFailedException("Invalid voucher ID.", HttpStatus.BAD_REQUEST);
+            throw new OrderFailedException("Voucher ID is invalid.", HttpStatus.BAD_REQUEST);
         }
     }
 

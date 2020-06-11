@@ -5,6 +5,7 @@ import dana.order.entity.Transaction;
 import dana.order.entity.User;
 import dana.order.usecase.exception.OrderFailedException;
 import dana.order.usecase.exception.TOPUPFailedException;
+import dana.order.usecase.exception.UserException;
 import dana.order.usecase.port.DatabaseMapper;
 import dana.order.usecase.port.TransactionRepository;
 import dana.order.usecase.port.UserRepository;
@@ -32,6 +33,10 @@ public class TOPUP {
     public JSONObject execute(JSONObject json){
 
         validateTOPUP.check(json);
+
+        if (userRepository.doesUserExist(""+json.get("idUser")) == Boolean.FALSE){
+            throw new UserException("The user is not found.", HttpStatus.NOT_FOUND);
+        }
 
         Boolean consistency = Boolean.FALSE;
         Integer counter = 0;
@@ -68,7 +73,7 @@ public class TOPUP {
         }
 
         if (transactionRepository.checkTOPUPThirdParty(partyCode) == Boolean.FALSE){
-            throw new TOPUPFailedException("The merchant is currently not available for balance TOPUP.", HttpStatus.NOT_FOUND);
+            throw new TOPUPFailedException("TOPUP failed! The merchant is currently not available for balance TOPUP.", HttpStatus.NOT_FOUND);
         }
 
         transactionRepository.TOPUPBalance(""+json.get("idUser"), Double.valueOf(""+json.get("amount")),
@@ -78,6 +83,6 @@ public class TOPUP {
 
         transactionRepository.broadcastATransaction(transaction.getIdTransaction());
 
-        return ResponseWrapper.wrap("Your TOPUP is successful!", 200, null);
+        return ResponseWrapper.wrap("Your TOPUP is successful.", 201, null);
     }
 }

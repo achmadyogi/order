@@ -12,11 +12,11 @@ import java.util.regex.Pattern;
 public class ValidatePayAVoucher {
     public void check(JSONObject json){
         if(json.get("idTransaction") == null){
-            throw new PaymentFailedException("Voucher ID cannot be empty.", HttpStatus.BAD_REQUEST);
+            throw new PaymentFailedException("Transaction ID cannot be empty.", HttpStatus.BAD_REQUEST);
         }
 
         if(idTransactionCheck(""+json.get("idTransaction")) == Boolean.FALSE){
-            throw new PaymentFailedException("Invalid transaction ID.", HttpStatus.BAD_REQUEST);
+            throw new PaymentFailedException("Transaction ID is invalid.", HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -61,7 +61,7 @@ public class User {
     public JSONObject toJsonObject(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JSONObject obj = new JSONObject();
-        obj.put("idUser", Integer.valueOf(idUser));
+        obj.put("idUser", idUser);
         obj.put("balance", Double.valueOf(balance));
         obj.put("createAt", sdf.format(createdAt));
         obj.put("updatedAt", sdf.format(updatedAt));

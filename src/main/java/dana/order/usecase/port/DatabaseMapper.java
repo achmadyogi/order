@@ -1,11 +1,11 @@
 package dana.order.usecase.port;
 
-import dana.order.entity.ThirdParty;
-import dana.order.entity.Transaction;
-import dana.order.entity.User;
-import dana.order.entity.Voucher;
+import dana.order.entity.*;
 import org.apache.ibatis.annotations.*;
+import org.json.simple.JSONArray;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 @Mapper
@@ -36,6 +36,93 @@ public interface DatabaseMapper {
     final String addVirtualPayment = "INSERT INTO virtual_payments (id_transaction, virtual_number, id_third_party) VALUES " +
             "(#{idTransaction}, #{virtualNumber}, #{idThirdParty})";
     final String selectThirdPartyByCode = "SELECT * FROM third_parties WHERE party_code = #{partyCode}";
+    final String selectTransactionHistory = "SELECT id_transaction, id_user, " +
+            "CASE WHEN is_credit = 1 THEN amount ELSE amount*(-1) END AS amount, " +
+            "    transaction_date,  status_name AS `status`, method_name AS payment_method, " +
+            "    service_name AS service, voucher_name, merchant_name, transactions.created_at, transactions.updated_at FROM `transactions` " +
+            "LEFT JOIN transaction_statuses ON transactions.id_transaction_status = transaction_statuses.id_transaction_status " +
+            "LEFT JOIN payment_methods ON payment_methods.id_payment_method = transactions.id_payment_method " +
+            "LEFT JOIN " +
+            "( " +
+            "    SELECT id_voucher, voucher_name, merchant_name FROM vouchers " +
+            "LEFT JOIN merchants ON vouchers.id_merchant = merchants.id_merchant " +
+            ") AS listVouchers ON listVouchers.id_voucher = transactions.id_goods " +
+            "LEFT JOIN services ON services.id_service = transactions.id_service WHERE id_user = #{idUser} " +
+            "AND transactions.id_transaction_status IN (#{category1}, #{category2}, #{category3}, #{category4}) " +
+            "AND DATE(transactions.created_at) >= DATE(#{startDate}) AND DATE(transactions.created_at) <= DATE(#{endDate}) " +
+            "LIMIT #{page},10";
+    final String getTotalTransactionHistory = "SELECT COUNT(*) AS amount FROM `transactions` " +
+            "WHERE id_user = #{idUser} " +
+            "AND transactions.id_transaction_status IN (#{category1}, #{category2}, #{category3}, #{category4}) " +
+            "AND DATE(transactions.created_at) >= DATE(#{startDate}) AND DATE(transactions.created_at) <= DATE(#{endDate}) ";
+    final String getUserFirstTransaction = "SELECT * FROM transactions WHERE id_user = #{idUser} ORDER BY created_at ASC LIMIT 1";
+    final String getUserLastTransaction = "SELECT * FROM transactions WHERE id_user = #{idUser} ORDER BY created_at DESC LIMIT 1";
+
+    @Select(getTotalTransactionHistory)
+    @Results(value = {
+            @Result(column = "amount")
+    })
+    Integer getTotalTransactionHistory(@Param("idUser") String idUser,
+                                       @Param("category1") Integer category1,
+                                       @Param("category2") Integer category2,
+                                       @Param("category3") Integer category3,
+                                       @Param("category4") Integer category4,
+                                       @Param("startDate") String startDate,
+                                       @Param("endDate") String endDate);
+
+    @Select(getUserFirstTransaction)
+    @Results(value = {
+            @Result(property = "idTransaction", column = "id_transaction"),
+            @Result(property = "idUser", column = "id_user"),
+            @Result(property = "amount", column = "amount"),
+            @Result(property = "transactionDate", column = "transaction_date"),
+            @Result(property = "isCredit", column = "is_credit"),
+            @Result(property = "idTransactionStatus", column = "id_transaction_status"),
+            @Result(property = "idPaymentMethod", column = "id_payment_method"),
+            @Result(property = "idService", column = "id_service"),
+            @Result(property = "idGoods", column = "id_goods"),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at")
+    })
+    Transaction getUserFirstTransaction(@Param("idUser") String idUser);
+
+    @Select(getUserLastTransaction)
+    @Results(value = {
+            @Result(property = "idTransaction", column = "id_transaction"),
+            @Result(property = "idUser", column = "id_user"),
+            @Result(property = "amount", column = "amount"),
+            @Result(property = "transactionDate", column = "transaction_date"),
+            @Result(property = "isCredit", column = "is_credit"),
+            @Result(property = "idTransactionStatus", column = "id_transaction_status"),
+            @Result(property = "idPaymentMethod", column = "id_payment_method"),
+            @Result(property = "idService", column = "id_service"),
+            @Result(property = "idGoods", column = "id_goods"),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at")
+    })
+    Transaction getUserLastTransaction(@Param("idUser") String idUser);
+
+    @Select(selectTransactionHistory)
+    @Results(value = {
+            @Result(property = "idTransaction", column = "id_transaction"),
+            @Result(property = "amount", column = "amount"),
+            @Result(property = "transactionDate", column = "transaction_date"),
+            @Result(property = "status", column = "status"),
+            @Result(property = "paymentMethod", column = "payment_method"),
+            @Result(property = "service", column = "service"),
+            @Result(property = "voucherName", column = "voucherName"),
+            @Result(property = "merchantName", column = "merchantName"),
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "updatedAt", column = "updated_at")
+    })
+    List<TransactionHistoryModel> selectTransactionHistory(@Param("idUser") String idUser,
+                                                           @Param("category1") Integer category1,
+                                                           @Param("category2") Integer category2,
+                                                           @Param("category3") Integer category3,
+                                                           @Param("category4") Integer category4,
+                                                           @Param("startDate") String startDate,
+                                                           @Param("endDate") String endDate,
+                                                           @Param("page") Integer page);
 
     @Select(selectThirdPartyByCode)
     @Results(value = {
