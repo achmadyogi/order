@@ -2,7 +2,6 @@ package dana.order.usecase.port;
 
 import dana.order.entity.*;
 import org.apache.ibatis.annotations.*;
-import org.json.simple.JSONArray;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -36,17 +35,11 @@ public interface DatabaseMapper {
     final String addVirtualPayment = "INSERT INTO virtual_payments (id_transaction, virtual_number, id_third_party) VALUES " +
             "(#{idTransaction}, #{virtualNumber}, #{idThirdParty})";
     final String selectThirdPartyByCode = "SELECT * FROM third_parties WHERE party_code = #{partyCode}";
-    final String selectTransactionHistory = "SELECT id_transaction, id_user, " +
-            "CASE WHEN is_credit = 1 THEN amount ELSE amount*(-1) END AS amount, " +
+    final String selectTransactionHistory = "SELECT id_transaction, id_user, amount, is_credit, " +
             "    transaction_date,  status_name AS `status`, method_name AS payment_method, " +
-            "    service_name AS service, voucher_name, merchant_name, transactions.created_at, transactions.updated_at FROM `transactions` " +
+            "    service_name AS service, transactions.created_at, transactions.updated_at FROM `transactions` " +
             "LEFT JOIN transaction_statuses ON transactions.id_transaction_status = transaction_statuses.id_transaction_status " +
             "LEFT JOIN payment_methods ON payment_methods.id_payment_method = transactions.id_payment_method " +
-            "LEFT JOIN " +
-            "( " +
-            "    SELECT id_voucher, voucher_name, merchant_name FROM vouchers " +
-            "LEFT JOIN merchants ON vouchers.id_merchant = merchants.id_merchant " +
-            ") AS listVouchers ON listVouchers.id_voucher = transactions.id_goods " +
             "LEFT JOIN services ON services.id_service = transactions.id_service WHERE id_user = #{idUser} " +
             "AND transactions.id_transaction_status IN (#{category1}, #{category2}, #{category3}, #{category4}) " +
             "AND DATE(transactions.created_at) >= DATE(#{startDate}) AND DATE(transactions.created_at) <= DATE(#{endDate}) " +
@@ -57,6 +50,49 @@ public interface DatabaseMapper {
             "AND DATE(transactions.created_at) >= DATE(#{startDate}) AND DATE(transactions.created_at) <= DATE(#{endDate}) ";
     final String getUserFirstTransaction = "SELECT * FROM transactions WHERE id_user = #{idUser} ORDER BY created_at ASC LIMIT 1";
     final String getUserLastTransaction = "SELECT * FROM transactions WHERE id_user = #{idUser} ORDER BY created_at DESC LIMIT 1";
+    final String getServiceById = "SELECT * FROM services WHERE id_service = #{idService}";
+    final String getTransactionStatus = "SELECT * FROM transaction_statuses WHERE id_transaction_status = #{idTransactionStatus}";
+    final String getPaymentMethod = "SELECT * FROM payment_methods WHERE id_payment_method = #{idPaymentMethod}";
+    final String getThirdParty = "SELECT third_parties.id_third_party, party_name, party_code FROM `third_parties`\n" +
+            "LEFT JOIN virtual_payments ON virtual_payments.id_third_party = third_parties.id_third_party\n" +
+            "WHERE id_transaction = #{idTransaction}";
+    final String getMerchantById = "SELECT * FROM merchants WHERE id_merchant = #{idMerchant}";
+
+    @Select(getMerchantById)
+    @Results(value = {
+            @Result(property = "idMerchant", column = "id_merchant"),
+            @Result(property = "merchantName", column = "merchant_name")
+    })
+    Merchant getMerchantById(@Param("idMerchant") Integer idMerchant);
+
+    @Select(getThirdParty)
+    @Results(value = {
+            @Result(property = "idThirdParty", column = "id_third_party"),
+            @Result(property = "partyName", column = "party_name"),
+            @Result(property = "partyCode", column = "party_code")
+    })
+    ThirdParty getThirdParty(@Param("idTransaction") Integer idTransaction);
+
+    @Select(getPaymentMethod)
+    @Results(value = {
+            @Result(property = "idPaymentMethod", column = "id_payment_method"),
+            @Result(property = "methodName", column = "method_name")
+    })
+    PaymentMethod getPaymentMethod(@Param("idPaymentMethod") Integer idPaymentMethod);
+
+    @Select(getTransactionStatus)
+    @Results(value = {
+            @Result(property = "idTransactionStatus", column = "id_transaction_status"),
+            @Result(property = "statusName", column = "status_name")
+    })
+    TransactionStatus getTransactionStatus(@Param("idTransactionStatus") Integer idTransactionStatus);
+
+    @Select(getServiceById)
+    @Results(value = {
+            @Result(property = "idService", column = "id_service"),
+            @Result(property = "serviceName", column = "service_name")
+    })
+    Services getServiceById(@Param("idService") Integer idService);
 
     @Select(getTotalTransactionHistory)
     @Results(value = {
@@ -107,11 +143,10 @@ public interface DatabaseMapper {
             @Result(property = "idTransaction", column = "id_transaction"),
             @Result(property = "amount", column = "amount"),
             @Result(property = "transactionDate", column = "transaction_date"),
-            @Result(property = "status", column = "status"),
+            @Result(property = "transactionStatus", column = "status"),
+            @Result(property = "isCredit", column = "is_credit"),
             @Result(property = "paymentMethod", column = "payment_method"),
-            @Result(property = "service", column = "service"),
-            @Result(property = "voucherName", column = "voucherName"),
-            @Result(property = "merchantName", column = "merchantName"),
+            @Result(property = "serviceName", column = "service"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at")
     })
@@ -246,7 +281,7 @@ public interface DatabaseMapper {
             @Result(property = "maxDiscountPrice", column = "max_discount_price"),
             @Result(property = "discount", column = "discount"),
             @Result(property = "voucherQuantity", column = "voucher_quantity"),
-            @Result(property = "is_active", column = "isActive"),
+            @Result(property = "isActive", column = "is_active"),
             @Result(property = "expiredDate", column = "expired_date"),
             @Result(property = "createdAt", column = "created_at"),
             @Result(property = "updatedAt", column = "updated_at")

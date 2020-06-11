@@ -1,7 +1,6 @@
 package dana.order.adapter.repository;
 
-import dana.order.entity.Transaction;
-import dana.order.entity.TransactionHistoryModel;
+import dana.order.entity.*;
 import dana.order.usecase.port.DatabaseMapper;
 import dana.order.usecase.port.HistoryRepository;
 import org.json.simple.JSONObject;
@@ -87,11 +86,11 @@ public class HistoryRepositoryImpl implements HistoryRepository {
         }
 
         if (json.get("page") != null){
-            start = Integer.valueOf(""+json.get("page"))*10-10;
+            start = (1+Integer.valueOf(""+json.get("page")))*10-10;
             page = Integer.valueOf(""+json.get("page"));
         }else {
             start = 0;
-            page = 1;
+            page = 0;
         }
 
         List<TransactionHistoryModel> result = databaseMapper.selectTransactionHistory(""+json.get("idUser"),
@@ -101,9 +100,9 @@ public class HistoryRepositoryImpl implements HistoryRepository {
                 category1, category2, category3, category4, startDate, endDate);
         Integer totalPages = Math.abs(totalRecords/10)+1;
         Integer currentRecords = 0;
-        if (totalPages == page){
+        if (totalPages-1 == page){
             currentRecords = totalRecords%10;
-        }else if (totalPages < page){
+        }else if (totalPages-1 < page){
             currentRecords = 0;
         }else {
             currentRecords = 10;
@@ -123,8 +122,46 @@ public class HistoryRepositoryImpl implements HistoryRepository {
     }
 
     public JSONObject getUserDetailedHistory(Integer idTransaction){
-        JSONObject data = new JSONObject();
 
-        return data;
+        Transaction transaction = databaseMapper.getTransactionById(idTransaction);
+
+        Services services = databaseMapper.getServiceById(transaction.getIdService());
+        TransactionStatus transactionStatus = databaseMapper.getTransactionStatus(transaction.getIdTransactionStatus());
+        PaymentMethod paymentMethod = databaseMapper.getPaymentMethod(transaction.getIdPaymentMethod());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        JSONObject transactionDetails = new JSONObject();
+        transactionDetails.put("idTransaction", transaction.getIdTransaction());
+        transactionDetails.put("serviceName", services.getServiceName());
+        transactionDetails.put("amount", transaction.getAmount());
+        transactionDetails.put("transactionDate", sdf.format(transaction.getTransactionDate()));
+        transactionDetails.put("transactionStatus", transactionStatus.getStatusName());
+        transactionDetails.put("paymentMethod", paymentMethod.getMethodName());
+        transactionDetails.put("isCredit", transaction.getIsCredit());
+        transactionDetails.put("createdAt", sdf.format(transaction.getCreatedAt()));
+        transactionDetails.put("updatedAt", sdf.format(transaction.getUpdatedAt()));
+
+        JSONObject details = new JSONObject();
+
+        if (transaction.getIdService() == 1){
+            //TOPUP
+            ThirdParty thirdParty = databaseMapper.getThirdParty(transaction.getIdTransaction());
+            details.put("provider", thirdParty.getPartyName());
+            transactionDetails.put("topup", details);
+        }
+
+        if (transaction.getIdService() == 2){
+            //Voucher
+            Voucher voucher = databaseMapper.getVoucherById(transaction.getIdGoods());
+            Merchant merchant = databaseMapper.getMerchantById(voucher.getIdMerchant());
+            details = voucher.toJsonObject();
+            details.put("merchantName", merchant.getMerchantName());
+            details.remove("createdAt");
+            details.remove("updatedAt");
+            transactionDetails.put("voucher", details);
+        }
+
+        return transactionDetails;
     }
 }

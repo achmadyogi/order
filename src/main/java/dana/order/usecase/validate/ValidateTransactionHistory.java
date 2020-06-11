@@ -29,8 +29,8 @@ public class ValidateTransactionHistory {
             }
 
             Integer page = Integer.valueOf(""+json.get("page"));
-            if (page < 1){
-                throw new HistoryFailedException("A page cannot have pagination numbers less than 1.", HttpStatus.BAD_REQUEST);
+            if (page < 0){
+                throw new HistoryFailedException("A page cannot have pagination numbers less than 0.", HttpStatus.BAD_REQUEST);
             }
         }
 

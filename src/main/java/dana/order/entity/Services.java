@@ -3,7 +3,7 @@ package dana.order.entity;
 import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 
-public class Service {
+public class Services {
     private Integer idService;
     private String serviceName;
 

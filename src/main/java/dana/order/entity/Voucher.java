@@ -83,12 +83,20 @@ public class Voucher {
         this.expiredDate = expiredDate;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
-        isActive = active;
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public void setIsActive(Integer isActive){
+        if (isActive == 1){
+            this.isActive = Boolean.TRUE;
+        }else{
+            this.isActive = Boolean.FALSE;
+        }
     }
 
     public Date getCreatedAt() {
@@ -124,7 +132,7 @@ public class Voucher {
         obj.put("voucherQuantity", Integer.valueOf(voucherQuantity));
         obj.put("expiredDate", expiredDate);
         obj.put("isActive", Boolean.valueOf(isActive));
-        obj.put("createAt", sdf.format(createdAt));
+        obj.put("createdAt", sdf.format(createdAt));
         obj.put("updatedAt", sdf.format(updatedAt));
 
         return obj;

@@ -10,11 +10,10 @@ public class TransactionHistoryModel {
     private Integer idTransaction;
     private Double amount;
     private String transactionDate;
-    private String status;
+    private String transactionStatus;
     private String paymentMethod;
-    private String service;
-    private String voucherName;
-    private String merchantName;
+    private String serviceName;
+    private Boolean isCredit;
     private Date createdAt;
     private Date updatedAt;
 
@@ -42,12 +41,20 @@ public class TransactionHistoryModel {
         this.transactionDate = transactionDate;
     }
 
-    public String getStatus() {
-        return status;
+    public String getTransactionStatus() {
+        return transactionStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTransactionStatus(String transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+
+    public Boolean getIsCredit() {
+        return isCredit;
+    }
+
+    public void setIsCredit(Boolean isCredit) {
+        this.isCredit = isCredit;
     }
 
     public String getPaymentMethod() {
@@ -58,40 +65,26 @@ public class TransactionHistoryModel {
         this.paymentMethod = paymentMethod;
     }
 
-    public String getService() {
-        return service;
+    public String getServiceName() {
+        return serviceName;
     }
 
-    public void setService(String service) {
-        this.service = service;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
-    public String getVoucherName() {
-        return voucherName;
-    }
-
-    public void setVoucherName(String voucherName) {
-        this.voucherName = voucherName;
-    }
-
-    public String getMerchantName() {
-        return merchantName;
-    }
-
-    public void setMerchantName(String merchantName) {
-        this.merchantName = merchantName;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
+    public String getCreatedAt() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(createdAt);
     }
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public String getUpdatedAt() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(updatedAt);
     }
 
     public void setUpdatedAt(Date updatedAt) {
@@ -108,12 +101,11 @@ public class TransactionHistoryModel {
         JSONObject obj = new JSONObject();
         obj.put("idTransaction", Integer.valueOf(idTransaction));
         obj.put("amount", Double.valueOf(amount));
+        obj.put("isCredit", Boolean.valueOf(isCredit));
         obj.put("transactionDate", sdf.format(transactionDate));
-        obj.put("status", status);
+        obj.put("transactionStatus", transactionStatus);
         obj.put("paymentMethod", paymentMethod);
-        obj.put("service", service);
-        obj.put("voucherName", voucherName);
-        obj.put("merchantName", merchantName);
+        obj.put("serviceName", serviceName);
         obj.put("createAt", createdAt);
         obj.put("updatedAt", updatedAt);
 

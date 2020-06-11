@@ -10,7 +10,7 @@ public class Transaction {
     private Integer idTransaction;
     private String idUser;
     private Double amount;
-    private String transactionDate;
+    private Date transactionDate;
     private Boolean isCredit;
     private Integer idTransactionStatus;
     private Integer idPaymentMethod;
@@ -35,20 +35,20 @@ public class Transaction {
         this.idUser = idUser;
     }
 
-    public String getTransactionDate() {
+    public Date getTransactionDate() {
         return transactionDate;
     }
 
-    public void setTransactionDate(String transactionDate) {
+    public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
 
-    public Boolean getCredit() {
+    public Boolean getIsCredit() {
         return isCredit;
     }
 
-    public void setCredit(Boolean credit) {
-        isCredit = credit;
+    public void setIsCredit(Boolean isCredit) {
+        this.isCredit = isCredit;
     }
 
     public Integer getIdTransactionStatus() {
