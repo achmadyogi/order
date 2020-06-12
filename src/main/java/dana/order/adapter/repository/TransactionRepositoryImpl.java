@@ -71,8 +71,4 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     public String getPhoneNumberFromVA(String virtualNumber){
         return (""+virtualNumber).substring(4);
     }
-
-    public void broadcastATransaction(Integer idTransaction){
-
-    }
 }

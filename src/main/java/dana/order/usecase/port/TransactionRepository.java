@@ -5,7 +5,6 @@ public interface TransactionRepository {
     Boolean validateVoucherConsistency(Integer idVoucher);
     Boolean checkATransactionExpiration(Integer idTransaction);
     void setFinishATransaction(Integer idTransaction);
-    void broadcastATransaction(Integer idTransaction);
     String getPartyCode(String virtualNumber);
     Boolean checkTOPUPThirdParty(String partyCode);
     void TOPUPBalance(String idUser, Double amount, String virtualNumber, String partyCode);

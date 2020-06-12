@@ -3,6 +3,7 @@ package dana.order.usecase.transaction;
 import dana.order.adapter.wrapper.ResponseWrapper;
 import dana.order.entity.Transaction;
 import dana.order.entity.User;
+import dana.order.usecase.broadcast.TransactionBroadcaster;
 import dana.order.usecase.exception.OrderFailedException;
 import dana.order.usecase.exception.TOPUPFailedException;
 import dana.order.usecase.exception.UserException;
@@ -29,6 +30,9 @@ public class TOPUP {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    TransactionBroadcaster transactionBroadcaster;
 
     public JSONObject execute(JSONObject json){
 
@@ -81,7 +85,7 @@ public class TOPUP {
 
         Transaction transaction = databaseMapper.getLatestUserSuccessfulTransaction(""+json.get("idUser"));
 
-        transactionRepository.broadcastATransaction(transaction.getIdTransaction());
+        //transactionBroadcaster.send(transaction.getIdTransaction());
 
         return ResponseWrapper.wrap("Your TOPUP is successful.", 201, null);
     }

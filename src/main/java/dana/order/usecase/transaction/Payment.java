@@ -3,6 +3,7 @@ package dana.order.usecase.transaction;
 import dana.order.adapter.wrapper.ResponseWrapper;
 import dana.order.entity.Transaction;
 import dana.order.entity.User;
+import dana.order.usecase.broadcast.TransactionBroadcaster;
 import dana.order.usecase.exception.OrderFailedException;
 import dana.order.usecase.exception.PaymentFailedException;
 import dana.order.usecase.exception.UserException;
@@ -33,6 +34,9 @@ public class Payment {
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    TransactionBroadcaster transactionBroadcaster;
 
     public JSONObject payAVoucher(JSONObject json){
 
@@ -111,7 +115,7 @@ public class Payment {
         }
 
         transactionRepository.setFinishATransaction(Integer.valueOf(""+json.get("idTransaction")));
-        transactionRepository.broadcastATransaction(Integer.valueOf(""+json.get("idTransaction")));
+        //transactionBroadcaster.send(Integer.valueOf(""+json.get("idTransaction")));
 
         return ResponseWrapper.wrap("Your payment is successful!", 200, null);
     }

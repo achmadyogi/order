@@ -43,7 +43,7 @@ public interface DatabaseMapper {
             "LEFT JOIN services ON services.id_service = transactions.id_service WHERE id_user = #{idUser} " +
             "AND transactions.id_transaction_status IN (#{category1}, #{category2}, #{category3}, #{category4}) " +
             "AND DATE(transactions.created_at) >= DATE(#{startDate}) AND DATE(transactions.created_at) <= DATE(#{endDate}) " +
-            "LIMIT #{page},10";
+            "ORDER BY transactions.created_at DESC LIMIT #{page},10 ";
     final String getTotalTransactionHistory = "SELECT COUNT(*) AS amount FROM `transactions` " +
             "WHERE id_user = #{idUser} " +
             "AND transactions.id_transaction_status IN (#{category1}, #{category2}, #{category3}, #{category4}) " +
