@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionBroadcaster {
-/*
+
     @Autowired
     RabbitTemplate rabbitTemplate;
 
@@ -19,14 +19,11 @@ public class TransactionBroadcaster {
     @Autowired
     DatabaseMapper databaseMapper;
 
- */
-
     public void send(Integer idTransaction){
-        /*
+
         Transaction transaction = databaseMapper.getTransactionById(idTransaction);
         System.out.println(transaction.toJsonString());
         rabbitTemplate.convertAndSend(fanoutExchange.getName(), "", transaction);
 
-         */
     }
 }

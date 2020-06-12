@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class BroadcastingConfig {
-    /*
+
     @Value("${spring.rabbitmq.username}")
     private String username;
 
@@ -69,5 +69,5 @@ public class BroadcastingConfig {
     public FanoutExchange fanout(){
         return new FanoutExchange("deals.order.yes1sfe94hksjf");
     }
-    */
+
 }
